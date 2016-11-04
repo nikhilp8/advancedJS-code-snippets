@@ -108,3 +108,107 @@ c;
 d=function(){
 
 };
+
+//An example to show that functions get hoisted first
+
+foo();
+var foo =2;
+function foo(){
+	console.log('bar');
+
+};
+function foo() {
+	console.log('foo');
+};
+//This becomes
+function foo(){console.log('bar')};
+function foo(){console.log('foo')};	// replaces the previous function, functions are over riden but not variables (strange)
+var foo;	// ignored declaration because there's already a variable called foo
+foo=2;
+foo();	// 'foo'
+
+//This keyword
+// every function while executing has a reference to its execution context called this
+// execution context depends on where the function is called & how its called. It all depends on callsite. Its the place where the function is executed
+// There are 4 rules.
+// 4th) Default binding rule
+// 'this' refers to an object
+// 3rd) implicit binding rule
+
+function foo() {
+	console.log(this.bar);
+};
+var bar = 'bar1';
+var o2 = {
+	bar:'bar2'
+	foo: foo
+}
+var o3 = {
+	bar:'bar3'
+	foo: foo
+}
+foo();		//bar1	// 4th rule
+o2.foo();	//bar2	// 3rd rule
+o3.foo();	//bar3	// 3rd rule
+
+//                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+//If we are in strict mode, 'this' is undefined. In non-strict mode it is global object
+
+var o1 = {
+	bar:'bar1',
+	foo: function() {
+		console.log(this.bar)
+	}
+}
+var o2 = {bar:'bar2',foo:o1.foo}	
+var bar ='bar3';
+var foo = o1.foo;
+
+o1.foo();	//bar1
+o2.foo();	//bar2
+foo();		//bar3
+
+//2nd rule: explicit binding rule. If you use .call() or .apply() at call site, this refers to that object
+
+function foo() {
+	console.log(this.bar);
+}
+
+var bar = 'bar1';
+var obj = {bar:'bar2'}
+
+foo();			//bar1
+foo.call(obj);	//bar2
+
+//another example
+
+function foo() {
+	console.log(this.bar);
+};
+obj = {bar:'bar1'};
+obj2 = {bar:'bar2'};
+
+var orig = foo;
+var foo = function() {orig.call(obj)};
+
+foo();				//bar1
+foo.call(obj2);		//bar1, here the 'this' keyword is hardcoded both at call site and inside. Should see what's inside the wrapper
+
+//1st rule: new keyword
+// // If you place new keyword infront of any function call it becomes constructor call.
+// 4 things occur when we put 'new' in front of the function call
+// 1. a new empty object is created
+// 2. object gets linked to a different object (prototype stuff)
+// 3. this new object becomes 'this' reference to the function call 
+// 4. if the function doesn't return anything, it will implicitly insert a return 'this'
+
+function foo(){
+	this.baz = 'baz';	// empty object.baz = 'baz'
+	console.log(this.bar +" " + baz);	// undefined undefined
+			// there is no property of bar in empty object & at the moment baz variable exists but no values is assigned to it, so becomes undefined
+			// returns the object now
+}
+var bar = 'bar';
+var baz = new foo();	// creates a new empty object
+
+// console.log(baz.baz)	// 'baz'	because the object is returned and had baz property
